@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\UX\Icons\UXIconsBundle;
+use Symfony\UX\TwigComponent\TwigComponentBundle;
+use Ubermuda\AdminBundle\Test\Functional\Fixtures\DashboardMenuItem;
 use Ubermuda\AdminBundle\UbermudaAdminBundle;
 
 final class AdminTestKernel extends Kernel
@@ -24,6 +26,7 @@ final class AdminTestKernel extends Kernel
             new TwigBundle(),
             new SecurityBundle(),
             new UXIconsBundle(),
+            new TwigComponentBundle(),
             new UbermudaAdminBundle(),
         ];
     }
@@ -54,17 +57,40 @@ final class AdminTestKernel extends Kernel
 
         $container->extension('twig', [
             'strict_variables' => true,
+            // Register the fixture templates so the functional test can render
+            // real, loader-based files (required for the ux-twig-component lexer
+            // to preprocess `<twig:...>` tags).
+            'paths' => [__DIR__.'/Fixtures/templates' => 'Test'],
+        ]);
+
+        $container->extension('twig_component', [
+            'anonymous_template_directory' => 'components/',
+            // No PHP-backed components ship in the bundle; anonymous templates
+            // resolve via the twig namespace fallback, so defaults stays empty.
+            'defaults' => [],
+        ]);
+
+        // ux-icons resolves `lucide:*` from the Iconify API by default; ignore
+        // missing icons so the admin nav renders without a network round-trip.
+        $container->extension('ux_icons', [
+            'ignore_not_found' => true,
         ]);
 
         $container->extension('security', [
             'providers' => ['in_memory' => ['memory' => null]],
             'firewalls' => ['main' => ['lazy' => true]],
         ]);
+
+        // The bundle's instanceof/tag rule is file-local to its own services.php,
+        // so the fixture menu item must be tagged explicitly here.
+        $container->services()
+            ->set(DashboardMenuItem::class)
+            ->tag('app.admin_menu_item');
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        // Stub route so path('app_dashboard') resolves in later tasks' admin layout.
+        // Stub route so path('app_dashboard') resolves in the admin layout.
         $routes->add('app_dashboard', '/')->methods(['GET']);
     }
 }

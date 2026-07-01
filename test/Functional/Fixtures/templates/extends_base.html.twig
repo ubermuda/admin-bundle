@@ -1,0 +1,9 @@
+{% extends '@UbermudaAdmin/base.html.twig' %}
+
+{# importmap() is intentionally not wired in the test kernel (Task 4 Option B),
+   so override the block to empty to avoid calling it. #}
+{% block importmap %}{% endblock %}
+
+{% block body %}
+    <p>Fixture body content.</p>
+{% endblock %}

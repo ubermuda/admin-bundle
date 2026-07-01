@@ -1,0 +1,21 @@
+<twig:UbermudaAdmin:AdminList
+    title="Widgets"
+    :total="1"
+    unitLabel="widget"
+    unitLabelPlural="widgets"
+    frameId="widgets-table"
+    :filters="{}"
+    route="app_dashboard"
+    :page="1"
+    :totalPages="1"
+    :pageList="[1]"
+    sort="name"
+    dir="asc"
+>
+    <twig:block name="thead">
+        <tr><th>Name</th></tr>
+    </twig:block>
+    <twig:block name="tbody">
+        <tr><td>Widget one</td></tr>
+    </twig:block>
+</twig:UbermudaAdmin:AdminList>
