@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html class="h-dvh" data-theme="makeplans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <title>{% block title %}Admin — {{ admin_brand_label }}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/caveat@5.0.3/index.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+
+    {% block stylesheets %}
+    {% endblock %}
+
+    {% block javascripts %}
+    {% endblock %}
+
+    {% block importmap %}{{ importmap(admin_importmap_entry) }}{% endblock %}
+</head>
+<body data-turbo="true" class="flex min-h-full bg-slate-100 font-jakarta">
+
+<div id="flash-messages">
+{% for label, messages in app.flashes %}
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2" style="pointer-events:none;">
+    {% for message in messages %}
+      <div class="admin-alert admin-alert-{{ label }} shadow-md" style="pointer-events:auto;min-width:280px;">
+        {{ message|trans }}
+      </div>
+    {% endfor %}
+  </div>
+{% endfor %}
+</div>
+
+<aside class="admin-sidebar w-56 shrink-0 min-h-screen text-white flex flex-col">
+    {% block brand %}
+    <div class="px-6 py-6 border-b border-white/15">
+        <a href="{{ path(admin_app_route) }}" class="admin-brand font-jakarta text-xl">{{ admin_brand_label }}</a>
+        <p class="text-xs text-white/50 mt-1 uppercase tracking-wider">Admin</p>
+    </div>
+    {% endblock %}
+
+    <nav class="flex flex-col gap-1 px-3 py-4 grow">
+        {% for item in admin_menu_items() %}
+            <a href="{{ path(item.routeName) }}"
+               class="admin-nav-link {{ app.request.attributes.get('_route') starts with item.activeRoutePrefix ? 'is-active' : '' }}">
+                <twig:ux:icon name="lucide:{{ item.icon }}" class="w-4 h-4 shrink-0" />
+                {{ item.label }}
+            </a>
+        {% endfor %}
+    </nav>
+
+    {% block sidebar_footer %}
+    <div class="border-t border-white/15 px-3 py-4">
+        <a href="{{ path(admin_app_route) }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/50 transition hover:bg-white/15 hover:text-white">
+            <twig:ux:icon name="lucide:arrow-left" class="w-4 h-4 shrink-0" />
+            Back to app
+        </a>
+    </div>
+    {% endblock %}
+</aside>
+
+<div class="flex flex-col grow min-h-screen">
+    <main class="grow px-10 py-10">
+        {% block body %}{% endblock %}
+    </main>
+</div>
+
+</body>
+</html>

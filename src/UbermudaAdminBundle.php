@@ -21,6 +21,15 @@ class UbermudaAdminBundle extends AbstractBundle
             ->end();
     }
 
+    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        if ($builder->hasExtension('twig')) {
+            $builder->prependExtensionConfig('twig', [
+                'paths' => [__DIR__.'/../templates' => 'UbermudaAdmin'],
+            ]);
+        }
+    }
+
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $builder->setParameter('ubermuda_admin.brand_label', $config['brand_label']);
