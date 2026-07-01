@@ -1,0 +1,37 @@
+{% props route, frameId, searchPlaceholder, filters, sort, dir, clearParams = null, searchName = 'q', ignoreKeys = ['sort', 'dir'], routeParams = {} %}
+{# Filter bar for the admin listing framework. Wraps the standard layout:
+   - <form> wired to the autosearch Stimulus controller and the table's Turbo Frame
+   - hidden sort/dir inputs so the active sort survives auto-submits
+   - search <input> with the debounced auto-submit action
+   - the `filter_fields` named slot — caller drops <select>/<input> elements
+     here for entity-specific filters
+   - Clear button that drops the active filters but preserves the keys listed
+     in `clearParams` (defaults to {sort, dir})
+
+   `ignoreKeys` is the source-of-truth for "which form fields are filters".
+   It drives both the Clear-button-disabled check (server-rendered) and the
+   `data-autosearch-ignore-value` attribute (read by the JS controller). Pass
+   the same list to both — that's what callers want for sticky pinned filters
+   like the events `creatorId`. #}
+{% set effectiveClearParams = clearParams ?? {sort: sort, dir: dir} %}
+{% set activeFilters = filters|filter((value, key) => key not in ignoreKeys) %}
+<form method="get" action="{{ path(route, routeParams) }}"
+      data-controller="autosearch"
+      data-turbo-frame="{{ frameId }}"
+      data-turbo-action="replace"
+      data-autosearch-ignore-value="{{ ignoreKeys|json_encode }}"
+      class="admin-card flex items-center gap-3 mb-6 p-4">
+    <input type="hidden" name="sort" value="{{ sort }}">
+    <input type="hidden" name="dir" value="{{ dir }}">
+    <div class="grow">
+        <input type="text" name="{{ searchName }}" value="{{ filters[searchName] ?? '' }}"
+               placeholder="{{ searchPlaceholder }}"
+               data-action="input->autosearch#search"
+               class="admin-field-input w-full">
+    </div>
+    {% block filter_fields %}{% endblock %}
+    <a href="{{ path(route, routeParams|merge(effectiveClearParams)) }}"
+       data-autosearch-target="clearButton"
+       data-turbo-frame="_top"
+       class="admin-button-secondary admin-button-small {{ activeFilters is empty ? 'opacity-40 pointer-events-none' : '' }}">Clear</a>
+</form>

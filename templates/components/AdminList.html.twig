@@ -1,0 +1,79 @@
+{% props title, total, unitLabel, unitLabelPlural, frameId, filters, route, page, totalPages, pageList, sort, dir, ignoreKeys = ['sort', 'dir'], tableClass = 'admin-table table-fixed', emptyLabel = null, routeParams = {} %}
+{# Top-level shell for admin list pages. Caller composes the entity-specific
+   markup via named block slots:
+     - header_actions  — buttons on the right of the page header (Cleanup,
+                         New flag, etc.). Optional.
+     - filter_bar      — <twig:UbermudaAdmin:AdminListFilterBar> with its filter_fields slot.
+                         Optional; the bar lives outside the Turbo Frame so
+                         auto-submits replace only the table.
+     - filter_summary  — optional callouts (e.g. the "Filtered by creator"
+                         badge on the events page).
+     - empty_state     — text shown when the result set is empty. If omitted,
+                         falls back to "No <unitLabelPlural> found.".
+     - colgroup        — <col> width declarations for the table.
+     - thead           — the <tr> of <th> cells. Use <twig:UbermudaAdmin:AdminListSortLink>
+                         for sortable columns.
+     - tbody           — the <tr> rows. Caller still owns the cell markup
+                         (highlight, badges, action buttons, delete modal, etc.).
+
+   `ignoreKeys` is used for the "(filtered)" indicator next to the total — the
+   same predicate as the Clear-button-disabled check in <twig:UbermudaAdmin:AdminListFilterBar>.
+   That keeps the events page's behaviour where pinning by `creatorId` alone
+   does not flip the page into "filtered" mode (only user-driven filters do). #}
+{% set activeFilters = filters|filter((value, key) => key not in ignoreKeys) %}
+{% set effectiveEmptyLabel = emptyLabel ?? ('No ' ~ unitLabelPlural ~ ' found.') %}
+<div class="admin-page">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">{{ title }}</h1>
+            <p class="text-slate-500 text-sm mt-0.5">{{ total }} {{ total != 1 ? unitLabelPlural : unitLabel }} total{% if activeFilters is not empty %} (filtered){% endif %}</p>
+        </div>
+        {% block header_actions %}{% endblock %}
+    </div>
+
+    {% block filter_bar %}{% endblock %}
+
+    {% block filter_summary %}{% endblock %}
+
+    <turbo-frame id="{{ frameId }}">
+    {% if total == 0 %}
+        {% block empty_state %}<p class="text-slate-500">{{ effectiveEmptyLabel }}</p>{% endblock %}
+    {% else %}
+        <twig:UbermudaAdmin:AdminListPagination
+            route="{{ route }}"
+            :routeParams="routeParams"
+            :page="page"
+            :totalPages="totalPages"
+            :pageList="pageList"
+            sort="{{ sort }}"
+            dir="{{ dir }}"
+            :filters="filters"
+        />
+
+        <div class="admin-card overflow-hidden mt-4">
+            <table class="{{ tableClass }}">
+                {% block colgroup %}{% endblock %}
+                <thead>
+                    {% block thead %}{% endblock %}
+                </thead>
+                <tbody>
+                    {% block tbody %}{% endblock %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <twig:UbermudaAdmin:AdminListPagination
+                route="{{ route }}"
+                :routeParams="routeParams"
+                :page="page"
+                :totalPages="totalPages"
+                :pageList="pageList"
+                sort="{{ sort }}"
+                dir="{{ dir }}"
+                :filters="filters"
+            />
+        </div>
+    {% endif %}
+    </turbo-frame>
+</div>

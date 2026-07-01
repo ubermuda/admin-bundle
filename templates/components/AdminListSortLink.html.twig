@@ -1,0 +1,18 @@
+{% props route, column, label, currentSort, currentDir, filters, routeParams = {} %}
+{# Sort header link for the admin listing framework. The link toggles direction
+   when the current column is clicked again, otherwise defaults to asc. The
+   active column is highlighted; inactive columns get a subtle bidirectional
+   icon. Caller passes the route name so the same component drives all admin
+   list pages (users, events, feature flags). #}
+{% set nextDir = (currentSort == column and currentDir == 'asc') ? 'desc' : 'asc' %}
+<a href="{{ path(route, filters|merge(routeParams)|merge({sort: column, dir: nextDir})) }}"
+   data-turbo-action="replace"
+   class="flex items-center gap-1 hover:text-slate-900 {{ currentSort == column ? 'text-slate-900 font-semibold' : 'text-slate-500' }}">
+    {{- label -}}
+    {% if currentSort == column %}
+        {% if currentDir == 'asc' %}<twig:ux:icon name="lucide:arrow-up" class="w-3 h-3" />
+        {% else %}<twig:ux:icon name="lucide:arrow-down" class="w-3 h-3" />{% endif %}
+    {% else %}
+        <twig:ux:icon name="lucide:arrow-up-down" class="w-3 h-3 text-slate-300" />
+    {% endif %}
+</a>

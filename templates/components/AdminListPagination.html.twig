@@ -1,0 +1,31 @@
+{% props route, page, totalPages, pageList, sort, dir, filters, routeParams = {} %}
+{# Pagination control for the admin listing framework: prev/next arrows plus
+   the elided page-number list (caller computes via ListPagePagination::buildPageList).
+   Renders nothing when totalPages <= 1. Filter and sort/dir state are merged
+   into every page link so navigation preserves the active query. #}
+{% if totalPages > 1 %}
+    <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-500">Page {{ page }} of {{ totalPages }}</p>
+        <div class="flex gap-1">
+            {% if page > 1 %}
+                <a href="{{ path(route, filters|merge(routeParams)|merge({sort: sort, dir: dir, page: page - 1})) }}" data-turbo-action="replace" class="admin-button-secondary admin-button-small">«</a>
+            {% else %}
+                <button class="admin-button-secondary admin-button-small opacity-40" disabled>«</button>
+            {% endif %}
+            {% for p in pageList %}
+                {% if p is null %}
+                    <button class="admin-button-secondary admin-button-small opacity-40 pointer-events-none">…</button>
+                {% else %}
+                    <a href="{{ path(route, filters|merge(routeParams)|merge({sort: sort, dir: dir, page: p})) }}"
+                       data-turbo-action="replace"
+                       class="{{ p == page ? 'admin-button admin-button-small' : 'admin-button-secondary admin-button-small' }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page < totalPages %}
+                <a href="{{ path(route, filters|merge(routeParams)|merge({sort: sort, dir: dir, page: page + 1})) }}" data-turbo-action="replace" class="admin-button-secondary admin-button-small">»</a>
+            {% else %}
+                <button class="admin-button-secondary admin-button-small opacity-40" disabled>»</button>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
