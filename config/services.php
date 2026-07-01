@@ -14,9 +14,6 @@ return static function (ContainerConfigurator $container): void {
         ->bind('$appRoute', param('ubermuda_admin.app_route'))
         ->bind('$importmapEntry', param('ubermuda_admin.importmap_entry'));
 
-    $services->instanceof(\Ubermuda\AdminBundle\Menu\AdminMenuItemInterface::class)
-        ->tag('app.admin_menu_item');
-
     $services->load('Ubermuda\\AdminBundle\\', __DIR__.'/../src/')
         ->exclude([__DIR__.'/../src/UbermudaAdminBundle.php']);
 };

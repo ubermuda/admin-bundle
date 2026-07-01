@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Ubermuda\AdminBundle\Menu\AdminMenuItemInterface;
 
 class UbermudaAdminBundle extends AbstractBundle
 {
@@ -35,6 +36,9 @@ class UbermudaAdminBundle extends AbstractBundle
         $builder->setParameter('ubermuda_admin.brand_label', $config['brand_label']);
         $builder->setParameter('ubermuda_admin.app_route', $config['app_route']);
         $builder->setParameter('ubermuda_admin.importmap_entry', $config['importmap_entry']);
+
+        $builder->registerForAutoconfiguration(AdminMenuItemInterface::class)
+            ->addTag('app.admin_menu_item');
 
         $container->import('../config/services.php');
     }
