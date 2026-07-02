@@ -41,9 +41,29 @@ ubermuda_admin:
     app_route: 'app_dashboard'
     # importmap() entry rendered in the admin layout <head>.
     importmap_entry: 'app'
+    # data-theme attribute on <html> (e.g. a DaisyUI theme). Omitted when null.
+    theme: 'makeplans'
+    # Extra class(es) appended to <body>, e.g. an app font class.
+    body_class: 'font-jakarta'
 ```
 
-All three keys have defaults (`Admin`, `app_dashboard`, `app`); override the ones that differ.
+All keys have defaults (`Admin`, `app_dashboard`, `app`, `null`, `''`); override the ones that differ.
+
+### App fonts
+
+The layout renders no font `<link>`s of its own. To load app fonts in the admin, override the `head_fonts` block from your app — e.g. `templates/bundles/UbermudaAdminBundle/base.html.twig`:
+
+```twig
+{% extends '!@UbermudaAdmin/base.html.twig' %}
+
+{% block head_fonts %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+{% endblock %}
+```
+
+Pair it with `body_class` (and your Tailwind font utility) so the loaded font is actually applied.
 
 ## Tailwind / CSS wiring
 

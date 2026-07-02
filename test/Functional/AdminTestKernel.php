@@ -76,6 +76,11 @@ final class AdminTestKernel extends Kernel
             'ignore_not_found' => true,
         ]);
 
+        $container->extension('ubermuda_admin', [
+            'theme' => 'test-theme',
+            'body_class' => 'font-test',
+        ]);
+
         $container->extension('security', [
             'providers' => ['in_memory' => ['memory' => null]],
             'firewalls' => ['main' => ['lazy' => true]],
