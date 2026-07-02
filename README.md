@@ -54,7 +54,7 @@ All keys have defaults (`Admin`, `app_dashboard`, `app`, `null`, `''`); override
 The layout renders no font `<link>`s of its own. To load app fonts in the admin, override the `head_fonts` block from your app — e.g. `templates/bundles/UbermudaAdminBundle/base.html.twig`:
 
 ```twig
-{% extends '!@UbermudaAdmin/base.html.twig' %}
+{% extends '@!UbermudaAdmin/base.html.twig' %}
 
 {% block head_fonts %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
