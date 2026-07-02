@@ -26,14 +26,10 @@ class UbermudaAdminBundle extends AbstractBundle
             ->end();
     }
 
-    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
-    {
-        if ($builder->hasExtension('twig')) {
-            $builder->prependExtensionConfig('twig', [
-                'paths' => [__DIR__.'/../templates' => 'UbermudaAdmin'],
-            ]);
-        }
-    }
+    // No prependExtension: TwigBundle already registers this bundle's templates/
+    // dir under @UbermudaAdmin. A manual twig.paths prepend would sit AHEAD of the
+    // app's templates/bundles/UbermudaAdminBundle/ override dir in the loader path
+    // order, silently disabling app template overrides (e.g. the head_fonts block).
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
