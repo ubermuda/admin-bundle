@@ -12,7 +12,9 @@ return static function (ContainerConfigurator $container): void {
         ->autoconfigure()
         ->bind('$brandLabel', param('ubermuda_admin.brand_label'))
         ->bind('$appRoute', param('ubermuda_admin.app_route'))
-        ->bind('$importmapEntry', param('ubermuda_admin.importmap_entry'));
+        ->bind('$importmapEntry', param('ubermuda_admin.importmap_entry'))
+        ->bind('$theme', param('ubermuda_admin.theme'))
+        ->bind('$bodyClass', param('ubermuda_admin.body_class'));
 
     $services->load('Ubermuda\\AdminBundle\\', __DIR__.'/../src/')
         ->exclude([__DIR__.'/../src/UbermudaAdminBundle.php']);

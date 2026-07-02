@@ -54,6 +54,18 @@ final class TemplateRenderingTest extends KernelTestCase
         self::assertStringContainsString('is-active', $html);
     }
 
+    public function testConfiguredThemeAndBodyClassRender(): void
+    {
+        $html = $this->twig('app_dashboard')->render('@Test/extends_base.html.twig');
+
+        // theme config -> data-theme attribute on <html>.
+        self::assertStringContainsString('data-theme="test-theme"', $html);
+        // body_class config -> appended to the <body> class list.
+        self::assertMatchesRegularExpression('/<body[^>]*class="[^"]*font-test/', $html);
+        // No font <link>s ship by default -- apps supply them via the head_fonts block.
+        self::assertStringNotContainsString('fonts.googleapis.com', $html);
+    }
+
     public function testNamespacedAdminListComponentResolvesAndRenders(): void
     {
         $html = $this->twig()->render('@Test/uses_adminlist.html.twig');

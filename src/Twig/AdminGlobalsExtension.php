@@ -11,16 +11,20 @@ final class AdminGlobalsExtension extends AbstractExtension implements GlobalsIn
         private string $brandLabel,
         private string $appRoute,
         private string $importmapEntry,
+        private ?string $theme,
+        private string $bodyClass,
     ) {
     }
 
-    /** @return array<string, string> */
+    /** @return array<string, string|null> */
     public function getGlobals(): array
     {
         return [
             'admin_brand_label' => $this->brandLabel,
             'admin_app_route' => $this->appRoute,
             'admin_importmap_entry' => $this->importmapEntry,
+            'admin_theme' => $this->theme,
+            'admin_body_class' => $this->bodyClass,
         ];
     }
 }

@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html class="h-dvh" data-theme="makeplans">
+<html class="h-dvh"{% if admin_theme %} data-theme="{{ admin_theme }}"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <meta name="turbo-refresh-method" content="morph">
     <meta name="turbo-refresh-scroll" content="preserve">
     <title>{% block title %}Admin — {{ admin_brand_label }}{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/caveat@5.0.3/index.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    {% block head_fonts %}{% endblock %}
 
     {% block stylesheets %}
     {% endblock %}
@@ -19,7 +16,7 @@
 
     {% block importmap %}{{ importmap(admin_importmap_entry) }}{% endblock %}
 </head>
-<body data-turbo="true" class="flex min-h-full bg-slate-100 font-jakarta">
+<body data-turbo="true" class="flex min-h-full bg-slate-100{{ admin_body_class ? ' ' ~ admin_body_class }}">
 
 <div id="flash-messages">
 {% for label, messages in app.flashes %}
@@ -36,7 +33,7 @@
 <aside class="admin-sidebar w-56 shrink-0 min-h-screen text-white flex flex-col">
     {% block brand %}
     <div class="px-6 py-6 border-b border-white/15">
-        <a href="{{ path(admin_app_route) }}" class="admin-brand font-jakarta text-xl">{{ admin_brand_label }}</a>
+        <a href="{{ path(admin_app_route) }}" class="admin-brand text-xl">{{ admin_brand_label }}</a>
         <p class="text-xs text-white/50 mt-1 uppercase tracking-wider">Admin</p>
     </div>
     {% endblock %}
