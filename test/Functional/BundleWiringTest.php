@@ -29,5 +29,18 @@ final class BundleWiringTest extends KernelTestCase
         self::assertSame('Admin', $container->getParameter('ubermuda_admin.brand_label'));
         self::assertSame('app_dashboard', $container->getParameter('ubermuda_admin.app_route'));
         self::assertSame('app', $container->getParameter('ubermuda_admin.importmap_entry'));
+        self::assertNull($container->getParameter('ubermuda_admin.admin_email'));
+        self::assertSame('ROLE_ADMIN', $container->getParameter('ubermuda_admin.admin_role'));
+    }
+
+    public function testPromotionListenerIsAbsentWithoutDoctrine(): void
+    {
+        self::bootKernel();
+
+        // The test kernel ships no DoctrineBundle, so the conditional
+        // registration in loadExtension must skip the listener.
+        self::assertFalse(
+            self::getContainer()->has(\Ubermuda\AdminBundle\Security\PromoteAdminUserListener::class),
+        );
     }
 }

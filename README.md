@@ -65,6 +65,33 @@ The layout renders no font `<link>`s of its own. To load app fonts in the admin,
 
 Pair it with `body_class` (and your Tailwind font utility) so the loaded font is actually applied.
 
+## Admin-email promotion
+
+When `admin_email` is configured (and DoctrineBundle is present), `PromoteAdminUserListener` grants `admin_role` (default `ROLE_ADMIN`) to the user whose email matches, on login — and refreshes the security token so the promotion applies immediately without a "user has changed" deauthentication. Null/empty `admin_email` disables the listener; without DoctrineBundle it is not registered at all.
+
+```yaml
+ubermuda_admin:
+    admin_email: '%env(ADMIN_EMAIL)%'
+```
+
+Opt the user entity in by implementing `Ubermuda\AdminBundle\Security\AdminPromotableUser` — plain public `$email` / `$roles` properties satisfy the interface's property hooks:
+
+```php
+use Ubermuda\AdminBundle\Security\AdminPromotableUser;
+
+class User implements AdminPromotableUser
+{
+    public ?string $email = null;
+
+    /** @var list<string> */
+    public array $roles = [];
+
+    // getRoles(), getUserIdentifier(), eraseCredentials() as usual
+}
+```
+
+Promotion is logged at `info` as `admin.user.promoted` with the email and role.
+
 ## Tailwind / CSS wiring
 
 The bundle ships its structural CSS as a Tailwind v4 source partial at `assets/admin.css`. The consuming app compiles it in its own Tailwind pass — the bundle does **not** ship compiled CSS. Three steps:

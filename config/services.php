@@ -17,5 +17,10 @@ return static function (ContainerConfigurator $container): void {
         ->bind('$bodyClass', param('ubermuda_admin.body_class'));
 
     $services->load('Ubermuda\\AdminBundle\\', __DIR__.'/../src/')
-        ->exclude([__DIR__.'/../src/UbermudaAdminBundle.php']);
+        ->exclude([
+            __DIR__.'/../src/UbermudaAdminBundle.php',
+            // Registered conditionally in UbermudaAdminBundle::loadExtension --
+            // it requires Doctrine, which not every consumer ships.
+            __DIR__.'/../src/Security/PromoteAdminUserListener.php',
+        ]);
 };
