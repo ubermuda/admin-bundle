@@ -55,7 +55,12 @@ class UbermudaAdminBundle extends AbstractBundle
 
         // The promotion listener persists via Doctrine; only register it when
         // DoctrineBundle is present so Doctrine-less consumers still compile.
-        if ($builder->hasExtension('doctrine')) {
+        // Checked via kernel.bundles, NOT hasExtension('doctrine'):
+        // loadExtension runs against a temporary container that only has this
+        // bundle's own extension registered, so hasExtension() is always false
+        // here (it only reflects reality in prependExtension).
+        $bundles = $builder->getParameter('kernel.bundles');
+        if (is_array($bundles) && isset($bundles['DoctrineBundle'])) {
             $container->services()
                 ->set(PromoteAdminUserListener::class)
                 ->autowire()
