@@ -42,6 +42,18 @@ final readonly class PromoteAdminUserListener
             return;
         }
 
+        // An open-registration app lets anyone register any address. Never
+        // promote an account whose address has not been proven — otherwise
+        // registering the admin's email first is an instant takeover of the
+        // admin role.
+        if (!$user->isVerified()) {
+            $this->logger->warning('admin.user.promotion_skipped_unverified', [
+                'email' => $user->email,
+            ]);
+
+            return;
+        }
+
         if (in_array($this->adminRole, $user->roles, true)) {
             return;
         }

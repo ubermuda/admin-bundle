@@ -10,7 +10,13 @@ final class PromotableUser implements AdminPromotableUser
     public function __construct(
         public ?string $email = null,
         public array $roles = [],
+        private bool $verified = true,
     ) {
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->verified;
     }
 
     /** @return list<string> */
