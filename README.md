@@ -67,14 +67,16 @@ Pair it with `body_class` (and your Tailwind font utility) so the loaded font is
 
 ## Admin-email promotion
 
-When `admin_email` is configured (and DoctrineBundle is present), `PromoteAdminUserListener` grants `admin_role` (default `ROLE_ADMIN`) to the user whose email matches, on login — and refreshes the security token so the promotion applies immediately without a "user has changed" deauthentication. Null/empty `admin_email` disables the listener; without DoctrineBundle it is not registered at all.
+When `admin_email` is configured (and DoctrineBundle is present), `PromoteAdminUserListener` grants `admin_role` (default `ROLE_ADMIN`) to the user whose email matches **and whose address has been verified**, on login — and refreshes the security token so the promotion applies immediately without a "user has changed" deauthentication. Null/empty `admin_email` disables the listener; without DoctrineBundle it is not registered at all.
+
+The verification requirement is not optional: in an open-registration app anyone can sign up with any address, so promoting on an email match alone lets an attacker take the admin role simply by registering the admin's address first. Unverified matches are skipped and logged at `warning` as `admin.user.promotion_skipped_unverified`.
 
 ```yaml
 ubermuda_admin:
     admin_email: '%env(ADMIN_EMAIL)%'
 ```
 
-Opt the user entity in by implementing `Ubermuda\AdminBundle\Security\AdminPromotableUser` — plain public `$email` / `$roles` properties satisfy the interface's property hooks:
+Opt the user entity in by implementing `Ubermuda\AdminBundle\Security\AdminPromotableUser` — plain public `$email` / `$roles` properties satisfy the interface's property hooks, and `isVerified()` reports whether the address has been confirmed:
 
 ```php
 use Ubermuda\AdminBundle\Security\AdminPromotableUser;
@@ -86,9 +88,18 @@ class User implements AdminPromotableUser
     /** @var list<string> */
     public array $roles = [];
 
+    public ?\DateTimeImmutable $emailVerifiedAt = null;
+
+    public function isVerified(): bool
+    {
+        return null !== $this->emailVerifiedAt;
+    }
+
     // getRoles(), getUserIdentifier(), eraseCredentials() as usual
 }
 ```
+
+An app with no email-verification step of its own can `return true;` — but only if registration cannot be self-served with an arbitrary address.
 
 Promotion is logged at `info` as `admin.user.promoted` with the email and role.
 

@@ -15,4 +15,10 @@ interface AdminPromotableUser extends UserInterface
 
     /** @var list<string> */
     public array $roles { get; set; }
+
+    /**
+     * Whether the account's email address has been proven to belong to its
+     * owner. Promotion is skipped for unverified accounts.
+     */
+    public function isVerified(): bool;
 }

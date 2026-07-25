@@ -86,6 +86,24 @@ final class PromoteAdminUserListenerTest extends TestCase
         self::assertSame([], $user->roles);
     }
 
+    public function testIgnoresUnverifiedUserWithMatchingEmail(): void
+    {
+        $user = new PromotableUser(email: 'admin@example.com', roles: [], verified: false);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
+        $tokenStorage = new TokenStorage();
+        $logger = new RecordingLogger();
+
+        $listener = new PromoteAdminUserListener($entityManager, $tokenStorage, $logger, 'admin@example.com', 'ROLE_ADMIN');
+        $listener($this->loginEvent($user));
+
+        self::assertSame([], $user->roles);
+        self::assertNull($tokenStorage->getToken());
+        self::assertFalse($logger->hasRecord('info', 'admin.user.promoted'));
+        self::assertTrue($logger->hasRecord('warning', 'admin.user.promotion_skipped_unverified'));
+    }
+
     public function testIgnoresUserNotImplementingPromotableInterface(): void
     {
         $user = $this->createMock(UserInterface::class);
