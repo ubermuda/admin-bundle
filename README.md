@@ -213,6 +213,28 @@ final class UsersMenuItem implements AdminMenuItemInterface
 
 Items render ordered by priority, **higher first** (an item with priority `100` appears above one with `60`).
 
+### Opting a nav item out of Turbo prefetch
+
+The admin layout opts into Turbo, so hovering a sidebar link prefetches its target page. That is free speed for an ordinary page, but a page whose controller does real work merely to render — outbound network probes, an expensive report, anything with a side effect — then does that work every time the pointer crosses its nav entry, with no user intent behind it.
+
+Such an item implements `Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem` (which extends `AdminMenuItemInterface`, so autoconfiguration still tags it) and returns `false`:
+
+```php
+use Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem;
+
+final class SystemStatusMenuItem implements PrefetchableAdminMenuItem
+{
+    // getLabel(), getIcon(), getRouteName(), getActiveRoutePrefix(), getPriority() as usual
+
+    public function shouldPrefetch(): bool
+    {
+        return false;
+    }
+}
+```
+
+The layout then renders `data-turbo-prefetch="false"` on that item's `<a>`. The interface is **optional**: an item that does not implement it is prefetched exactly as before, so existing menu items need no change.
+
 ## Listing components
 
 The listing framework is exposed as Twig components under the `UbermudaAdmin` namespace. Reference them with the namespace prefix:

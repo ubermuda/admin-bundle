@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\UX\Icons\UXIconsBundle;
 use Symfony\UX\TwigComponent\TwigComponentBundle;
 use Ubermuda\AdminBundle\Test\Functional\Fixtures\DashboardMenuItem;
+use Ubermuda\AdminBundle\Test\Functional\Fixtures\SystemStatusMenuItem;
 use Ubermuda\AdminBundle\UbermudaAdminBundle;
 
 final class AdminTestKernel extends Kernel
@@ -87,15 +88,20 @@ final class AdminTestKernel extends Kernel
         ]);
 
         // The bundle's instanceof/tag rule is file-local to its own services.php,
-        // so the fixture menu item must be tagged explicitly here.
+        // so the fixture menu items must be tagged explicitly here.
         $container->services()
             ->set(DashboardMenuItem::class)
+            ->tag('app.admin_menu_item');
+
+        $container->services()
+            ->set(SystemStatusMenuItem::class)
             ->tag('app.admin_menu_item');
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        // Stub route so path('app_dashboard') resolves in the admin layout.
+        // Stub routes so path() resolves for both fixture menu items.
         $routes->add('app_dashboard', '/')->methods(['GET']);
+        $routes->add('app_admin_system_status', '/admin/system-status')->methods(['GET']);
     }
 }

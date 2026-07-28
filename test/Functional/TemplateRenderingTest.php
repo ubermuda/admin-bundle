@@ -66,6 +66,20 @@ final class TemplateRenderingTest extends KernelTestCase
         self::assertStringNotContainsString('fonts.googleapis.com', $html);
     }
 
+    public function testMenuItemOptingOutOfPrefetchRendersTheTurboAttribute(): void
+    {
+        $html = $this->twig('app_dashboard')->render('@Test/extends_base.html.twig');
+
+        // The fixture returning shouldPrefetch() === false gets the attribute...
+        self::assertMatchesRegularExpression(
+            '/<a[^>]*href="\/admin\/system-status"[^>]*data-turbo-prefetch="false"[^>]*>/',
+            $html,
+        );
+        // ...and it is the only anchor in the document that carries it, which is
+        // what proves the plain fixture (and the brand/footer links) are untouched.
+        self::assertSame(1, substr_count($html, 'data-turbo-prefetch'));
+    }
+
     public function testNamespacedAdminListComponentResolvesAndRenders(): void
     {
         $html = $this->twig()->render('@Test/uses_adminlist.html.twig');
