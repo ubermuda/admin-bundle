@@ -217,23 +217,20 @@ Items render ordered by priority, **higher first** (an item with priority `100` 
 
 The admin layout opts into Turbo, so hovering a sidebar link prefetches its target page. That is free speed for an ordinary page, but a page whose controller does real work merely to render — outbound network probes, an expensive report, anything with a side effect — then does that work every time the pointer crosses its nav entry, with no user intent behind it.
 
-Such an item implements `Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem` (which extends `AdminMenuItemInterface`, so autoconfiguration still tags it) and returns `false`:
+Such an item implements the marker interface `Ubermuda\AdminBundle\Menu\NonPrefetchableAdminMenuItem` instead of `AdminMenuItemInterface`. It declares no methods — implementing it is the whole statement — and it extends `AdminMenuItemInterface`, so autoconfiguration still tags the service:
 
 ```php
-use Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem;
+use Ubermuda\AdminBundle\Menu\NonPrefetchableAdminMenuItem;
 
-final class SystemStatusMenuItem implements PrefetchableAdminMenuItem
+final class SystemStatusMenuItem implements NonPrefetchableAdminMenuItem
 {
     // getLabel(), getIcon(), getRouteName(), getActiveRoutePrefix(), getPriority() as usual
-
-    public function shouldPrefetch(): bool
-    {
-        return false;
-    }
 }
 ```
 
 The layout then renders `data-turbo-prefetch="false"` on that item's `<a>`. The interface is **optional**: an item that does not implement it is prefetched exactly as before, so existing menu items need no change.
+
+There is deliberately no method to toggle this per request. Whether a page is safe to prefetch is a property of its controller's code, not of the current request — a controller either does side-effectful or expensive work on `GET` or it does not.
 
 ## Listing components
 

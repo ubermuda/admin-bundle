@@ -6,26 +6,21 @@ use ArrayIterator;
 use PHPUnit\Framework\TestCase;
 use Ubermuda\AdminBundle\Menu\AdminMenuItemInterface;
 use Ubermuda\AdminBundle\Menu\AdminMenuRegistry;
-use Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem;
+use Ubermuda\AdminBundle\Menu\NonPrefetchableAdminMenuItem;
 use Ubermuda\AdminBundle\Twig\AdminMenuExtension;
 
 final class AdminMenuExtensionTest extends TestCase
 {
-    public function testItemNotImplementingThePrefetchInterfaceIsPrefetched(): void
+    public function testPlainItemKeepsPrefetchEnabled(): void
     {
         // The backwards-compatibility case: every menu item written before the
         // interface existed keeps the previous behaviour.
-        self::assertTrue($this->extension()->shouldPrefetch($this->plainItem()));
+        self::assertFalse($this->extension()->isPrefetchDisabled($this->plainItem()));
     }
 
-    public function testItemOptingOutIsNotPrefetched(): void
+    public function testItemImplementingTheMarkerHasPrefetchDisabled(): void
     {
-        self::assertFalse($this->extension()->shouldPrefetch($this->prefetchableItem(false)));
-    }
-
-    public function testItemOptingInIsPrefetched(): void
-    {
-        self::assertTrue($this->extension()->shouldPrefetch($this->prefetchableItem(true)));
+        self::assertTrue($this->extension()->isPrefetchDisabled($this->nonPrefetchableItem()));
     }
 
     public function testThePrefetchFunctionIsExposedToTwig(): void
@@ -35,7 +30,7 @@ final class AdminMenuExtensionTest extends TestCase
             $this->extension()->getFunctions(),
         );
 
-        self::assertContains('admin_menu_item_prefetch', $names);
+        self::assertContains('admin_menu_item_prefetch_disabled', $names);
     }
 
     private function extension(): AdminMenuExtension
@@ -73,17 +68,12 @@ final class AdminMenuExtensionTest extends TestCase
         };
     }
 
-    private function prefetchableItem(bool $shouldPrefetch): PrefetchableAdminMenuItem
+    private function nonPrefetchableItem(): NonPrefetchableAdminMenuItem
     {
-        return new class($shouldPrefetch) implements PrefetchableAdminMenuItem {
-            public function __construct(
-                private readonly bool $shouldPrefetch,
-            ) {
-            }
-
+        return new class implements NonPrefetchableAdminMenuItem {
             public function getLabel(): string
             {
-                return 'Prefetchable';
+                return 'Not prefetchable';
             }
 
             public function getIcon(): string
@@ -93,22 +83,17 @@ final class AdminMenuExtensionTest extends TestCase
 
             public function getRouteName(): string
             {
-                return 'app_admin_prefetchable';
+                return 'app_admin_not_prefetchable';
             }
 
             public function getActiveRoutePrefix(): string
             {
-                return 'app_admin_prefetchable';
+                return 'app_admin_not_prefetchable';
             }
 
             public function getPriority(): int
             {
                 return 100;
-            }
-
-            public function shouldPrefetch(): bool
-            {
-                return $this->shouldPrefetch;
             }
         };
     }

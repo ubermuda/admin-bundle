@@ -2,14 +2,14 @@
 
 namespace Ubermuda\AdminBundle\Test\Functional\Fixtures;
 
-use Ubermuda\AdminBundle\Menu\PrefetchableAdminMenuItem;
+use Ubermuda\AdminBundle\Menu\NonPrefetchableAdminMenuItem;
 
 /**
  * Stands in for the case the opt-out exists for: a page whose controller does
  * real work (network probes) just to render, so hovering its nav entry must not
  * trigger it.
  */
-final class SystemStatusMenuItem implements PrefetchableAdminMenuItem
+final class SystemStatusMenuItem implements NonPrefetchableAdminMenuItem
 {
     public function getLabel(): string
     {
@@ -34,10 +34,5 @@ final class SystemStatusMenuItem implements PrefetchableAdminMenuItem
     public function getPriority(): int
     {
         return 50;
-    }
-
-    public function shouldPrefetch(): bool
-    {
-        return false;
     }
 }

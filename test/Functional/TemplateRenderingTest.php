@@ -66,11 +66,11 @@ final class TemplateRenderingTest extends KernelTestCase
         self::assertStringNotContainsString('fonts.googleapis.com', $html);
     }
 
-    public function testMenuItemOptingOutOfPrefetchRendersTheTurboAttribute(): void
+    public function testNonPrefetchableMenuItemRendersTheTurboAttribute(): void
     {
         $html = $this->twig('app_dashboard')->render('@Test/extends_base.html.twig');
 
-        // The fixture returning shouldPrefetch() === false gets the attribute...
+        // The fixture implementing NonPrefetchableAdminMenuItem gets the attribute...
         self::assertMatchesRegularExpression(
             '/<a[^>]*href="\/admin\/system-status"[^>]*data-turbo-prefetch="false"[^>]*>/',
             $html,

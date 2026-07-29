@@ -41,7 +41,7 @@
     <nav class="flex flex-col gap-1 px-3 py-4 grow">
         {% for item in admin_menu_items() %}
             <a href="{{ path(item.routeName) }}"
-               class="admin-nav-link {{ app.request.attributes.get('_route') starts with item.activeRoutePrefix ? 'is-active' : '' }}"{% if not admin_menu_item_prefetch(item) %} data-turbo-prefetch="false"{% endif %}>
+               class="admin-nav-link {{ app.request.attributes.get('_route') starts with item.activeRoutePrefix ? 'is-active' : '' }}"{% if admin_menu_item_prefetch_disabled(item) %} data-turbo-prefetch="false"{% endif %}>
                 <twig:ux:icon name="lucide:{{ item.icon }}" class="w-4 h-4 shrink-0" />
                 {{ item.label }}
             </a>
