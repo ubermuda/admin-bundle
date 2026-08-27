@@ -123,17 +123,30 @@ The bundle's Twig templates emit utility classes (icons, spacing, colours) that 
 @import "../../vendor/ubermuda/admin-bundle/assets/admin.css";
 ```
 
-This defines the structural classes the base template and listing components need: `admin-page`, `admin-form`, `admin-edit-form`, `admin-edit-sidebar`, `admin-table` (+ `thead`/`tbody` rules), `admin-sidebar`, `admin-nav-link` (+ `.is-active`), `admin-brand`, and `admin-alert` + the `admin-alert-success` / `-error` / `-warning` / `-info` severity variants.
+This defines the structural classes the base template and listing components need: `admin-page`, `admin-form`, `admin-edit-form`, `admin-edit-sidebar`, `admin-table` (+ `thead`/`tbody` rules), `admin-sidebar`, `admin-content`, `admin-nav-link` (+ `.is-active`), `admin-brand`, `admin-flash-stack`, and `admin-alert` + the `admin-alert-success` / `-error` / `-warning` / `-info` severity variants.
 
-The sidebar background is themeable — override the CSS variable (or the whole rule) to brand it:
+The sidebar is pinned by the bundle — it is `position: fixed`, full viewport height, and `.admin-content` (the column beside it) carries the matching left offset. Both read the same width variable, so the app never has to reach into the layout to keep the nav in view. Fixed rather than sticky: the base template gives `<html>` a hard height, so a sticky nav has no travel range and scrolls away.
+
+Three custom properties make the chrome themeable; override them (or the whole rule) in your app's CSS:
 
 ```css
 .admin-sidebar {
+    width: var(--admin-sidebar-width, 14rem);
     background: var(--admin-sidebar-background, theme(colors.slate.900));
+}
+.admin-content {
+    margin-left: var(--admin-sidebar-width, 14rem);
+}
+.admin-flash-stack {
+    z-index: var(--admin-flash-z-index, 100);
 }
 ```
 
-Set `--admin-sidebar-background` (e.g. to your brand gradient) in your app's CSS to reskin the sidebar without touching the bundle.
+| Variable | Default | Role |
+|---|---|---|
+| `--admin-sidebar-background` | `slate.900` | Sidebar fill — set it to your brand gradient to reskin the nav. |
+| `--admin-sidebar-width` | `14rem` | Sidebar width **and** the content column's offset. Set it once; both follow. |
+| `--admin-flash-z-index` | `100` | Where the flash-message stack sits in your app's stacking order. |
 
 ### 3. Provide the primitive classes
 
