@@ -80,6 +80,41 @@ final class TemplateRenderingTest extends KernelTestCase
         self::assertSame(1, substr_count($html, 'data-turbo-prefetch'));
     }
 
+    public function testLayoutCarriesTheClassesThatPinTheSidebar(): void
+    {
+        $html = $this->twig('app_dashboard')->render('@Test/extends_base.html.twig');
+
+        // The sidebar is fixed by the bundle's own CSS, so the content column has
+        // to carry the matching offset. Both sides live on classes rather than on
+        // an adjacent-sibling selector, so wrapping or reordering the content
+        // wrapper cannot silently slide the page under the nav.
+        self::assertMatchesRegularExpression('/<aside[^>]*class="[^"]*\badmin-sidebar\b/', $html);
+        self::assertMatchesRegularExpression('/<div[^>]*class="[^"]*\badmin-content\b/', $html);
+
+        // The width lives in admin.css behind --admin-sidebar-width; a w-* utility
+        // on the aside would be in Tailwind's utilities layer and override it.
+        self::assertDoesNotMatchRegularExpression('/<aside[^>]*class="[^"]*\bw-\d/', $html);
+    }
+
+    public function testFlashMessagesRenderIntoTheThemeableStack(): void
+    {
+        self::bootKernel();
+        $container = self::getContainer();
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->getFlashBag()->add('success', 'Saved.');
+        $request = new Request();
+        $request->setSession($session);
+        $container->get('request_stack')->push($request);
+
+        $html = $container->get('twig')->render('@Test/extends_base.html.twig');
+
+        self::assertStringContainsString('admin-flash-stack', $html);
+        self::assertStringContainsString('admin-alert-success', $html);
+        // Each alert re-enables pointer events for itself; the stack disables them.
+        self::assertStringContainsString('pointer-events:auto', $html);
+    }
+
     public function testNamespacedAdminListComponentResolvesAndRenders(): void
     {
         $html = $this->twig()->render('@Test/uses_adminlist.html.twig');

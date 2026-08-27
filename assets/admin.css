@@ -61,10 +61,22 @@
 
     /* ── Sidebar chrome ──────────────────────────────────────────────────────── */
 
-    /* Admin sidebar aside. Themeable: the consuming app overrides
-       --admin-sidebar-background (or the whole rule) to brand the sidebar. */
+    /* Admin sidebar aside. Pinned here rather than by the consuming app, because
+       the offset below has to move with it. Fixed rather than sticky: the base
+       template gives <html> a hard height, so a sticky nav has no travel range
+       and rides the scroll away. Themeable: the consuming app overrides
+       --admin-sidebar-background and --admin-sidebar-width (or the whole rule). */
     .admin-sidebar {
+        @apply fixed top-0 left-0 overflow-y-auto;
+        width: var(--admin-sidebar-width, 14rem);
+        height: 100dvh;
         background: var(--admin-sidebar-background, theme(colors.slate.900));
+    }
+
+    /* Content column beside the sidebar. Carries the offset the fixed sidebar
+       no longer reserves, so the two widths must stay the same variable. */
+    .admin-content {
+        margin-left: var(--admin-sidebar-width, 14rem);
     }
 
     /* Sidebar nav link. Add .is-active for the current section. */
@@ -81,6 +93,15 @@
     }
 
     /* ── Alerts / flash messages ─────────────────────────────────────────────── */
+
+    /* Floating stack the flash messages are rendered into. The stacking order is
+       a custom property so the app can slot it into its own scale; each alert
+       re-enables pointer events for itself. */
+    .admin-flash-stack {
+        @apply fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2;
+        z-index: var(--admin-flash-z-index, 100);
+        pointer-events: none;
+    }
 
     /* Base alert container. Always pair with a severity variant. */
     .admin-alert {

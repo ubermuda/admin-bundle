@@ -20,7 +20,7 @@
 
 <div id="flash-messages">
 {% for label, messages in app.flashes %}
-  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2" style="pointer-events:none;">
+  <div class="admin-flash-stack">
     {% for message in messages %}
       <div class="admin-alert admin-alert-{{ label }} shadow-md" style="pointer-events:auto;min-width:280px;">
         {{ message|trans }}
@@ -30,7 +30,7 @@
 {% endfor %}
 </div>
 
-<aside class="admin-sidebar w-56 shrink-0 min-h-screen text-white flex flex-col">
+<aside class="admin-sidebar text-white flex flex-col">
     {% block brand %}
     <div class="px-6 py-6 border-b border-white/15">
         <a href="{{ path(admin_app_route) }}" class="admin-brand text-xl">{{ admin_brand_label }}</a>
@@ -58,7 +58,7 @@
     {% endblock %}
 </aside>
 
-<div class="flex flex-col grow min-h-screen">
+<div class="admin-content flex flex-col grow min-h-screen">
     <main class="grow px-10 py-10">
         {% block body %}{% endblock %}
     </main>
